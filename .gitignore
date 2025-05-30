@@ -1,0 +1,18 @@
+# Node modules
+node_modules/
+
+# SQLite databases
+*.db
+*.sqlite
+*.sqlite3
+
+# Logs
+*.log
+
+# Environment files
+.env
+
+# Build output (optional, if you compile TS)
+dist/
+build/
+tsconfig.tsbuildinfo
