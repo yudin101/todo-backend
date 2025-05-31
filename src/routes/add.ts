@@ -16,11 +16,11 @@ router.post(
       return;
     }
 
-    const { todo } = matchedData(req);
+    const { todo, deadline } = matchedData(req);
 
     try {
-      const insert = db.prepare("INSERT INTO todo_list (todo) VALUES (?)");
-      insert.run(todo);
+      const insert = db.prepare("INSERT INTO todo_list (todo, deadline) VALUES (?, ?)");
+      insert.run(todo, deadline);
 
       res.status(200).send({ message: "Todo added!" });
       return;

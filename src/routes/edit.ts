@@ -15,12 +15,22 @@ router.patch(
     }
 
     const { id } = req.params;
-    const { todo } = matchedData(req);
+    const { todo, deadline: newDeadline } = matchedData(req);
 
     try {
+      const { deadline: existingDeadline } = db
+        .prepare("SELECT deadline FROM todo_list WHERE id = ?")
+        .get(id) as { deadline: string };
+
+      let deadlineToUse = newDeadline;
+
+      if (newDeadline === undefined) {
+        deadlineToUse = existingDeadline;
+      }
+
       const update = db
-        .prepare("UPDATE todo_list SET todo = ? WHERE id = ?")
-        .run(todo, id);
+        .prepare("UPDATE todo_list SET todo = ?, deadline = ? WHERE id = ?")
+        .run(todo, deadlineToUse, id);
 
       if (update.changes === 0) {
         res.status(404).send({ errors: "Todo not found!" });
