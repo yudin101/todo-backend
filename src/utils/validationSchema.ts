@@ -29,3 +29,42 @@ export const todoValidation: Schema = {
     },
   },
 };
+
+export const registerCredentials: Schema = {
+  username: {
+    isString: {
+      errorMessage: "Username must be a string",
+    },
+    isLength: {
+      options: {
+        min: 5,
+        max: 20,
+      },
+      errorMessage: "Username must be within 5-20 characters",
+    },
+  },
+  password: {
+    isString: {
+      errorMessage: "Password must be a string",
+    },
+    isLength: {
+      options: {
+        min: 8,
+      },
+      errorMessage: "Password must be at least 8 characters long",
+    },
+  },
+};
+
+export const loginCredentials: Schema = {
+  username: {
+    isString: {
+      errorMessage: "Username must be a string",
+    },
+  },
+  password: {
+    isString: {
+      errorMessage: "Password must be a string",
+    },
+  },
+};

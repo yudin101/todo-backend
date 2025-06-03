@@ -9,6 +9,11 @@ router.post(
   "/add",
   checkSchema(todoValidation),
   (req: Request, res: Response) => {
+    if (!req.user) {
+      res.sendStatus(401);
+      return;
+    }
+
     const errors = validationResult(req);
 
     if (!errors.isEmpty()) {
@@ -17,12 +22,15 @@ router.post(
     }
 
     const { todo, deadline } = matchedData(req);
+    const { id: userId } = req.user;
 
     try {
-      const insert = db.prepare("INSERT INTO todo_list (todo, deadline) VALUES (?, ?)");
-      insert.run(todo, deadline);
+      const insert = db.prepare(
+        "INSERT INTO todo_list (user_id, todo, deadline) VALUES (?, ?, ?)",
+      );
+      insert.run(userId, todo, deadline);
 
-      res.status(200).send({ message: "Todo added!" });
+      res.status(201).send({ message: "Todo added!" });
       return;
     } catch (error) {
       console.error(error);

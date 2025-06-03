@@ -9,18 +9,24 @@ router.patch(
   "/edit/:id",
   checkSchema(todoValidation),
   (req: Request, res: Response) => {
+    if (!req.user) {
+      res.sendStatus(401);
+      return;
+    }
+
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
       res.status(400).send({ errors: errors.array() });
     }
 
-    const { id } = req.params;
+    const { id: todoId } = req.params;
     const { todo, deadline: newDeadline } = matchedData(req);
+    const { id: userId } = req.user;
 
     try {
       const { deadline: existingDeadline } = db
-        .prepare("SELECT deadline FROM todo_list WHERE id = ?")
-        .get(id) as { deadline: string };
+        .prepare("SELECT deadline FROM todo_list WHERE id = ? AND user_id = ?")
+        .get(todoId, userId) as { deadline: string };
 
       let deadlineToUse = newDeadline;
 
@@ -29,8 +35,8 @@ router.patch(
       }
 
       const update = db
-        .prepare("UPDATE todo_list SET todo = ?, deadline = ? WHERE id = ?")
-        .run(todo, deadlineToUse, id);
+        .prepare("UPDATE todo_list SET todo = ?, deadline = ? WHERE id = ? AND user_id = ?")
+        .run(todo, deadlineToUse, todoId, userId);
 
       if (update.changes === 0) {
         res.status(404).send({ errors: "Todo not found!" });
